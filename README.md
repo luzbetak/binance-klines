@@ -89,14 +89,6 @@ This program calculates and displays the Pi Cycle Indicator based on the data in
 ./2-pi-cycle-indicator 50
 ```
 
-### 3. Run Bitcoin Price Projection
-
-This program calculates a Bitcoin price projection.
-
-```bash
-./projection/projection
-```
-
 ## Notes
 
 - **API Keys**: No API keys are required for fetching public klines data from Binance.
