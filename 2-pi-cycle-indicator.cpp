@@ -26,9 +26,9 @@ const std::string GEMINI_API_URL = "https://api.gemini.com/v1/pubticker/btcusd";
 
 // --- Global variables to mimic Python's global state ---
 double first_row_yearly_value = 0.00;
-double first_row_baseline = 0.00;
-double first_row_avg_price = 0.00;
-double first_row_step = 0.00;
+double first_row_baseline     = 0.00;
+double first_row_avg_price    = 0.00;
+double first_row_step         = 0.00;
 
 // --- Helper function for cURL write callback ---
 size_t WriteCallback(void* contents, size_t size, size_t nmemb, std::string* s) {
@@ -52,17 +52,17 @@ struct Kline {
 struct PiCycleData {
     std::string date;
     double price;
-    double ma_365 = 0.0;      // 365-day Moving Average
-    double std_365 = 0.0;     // 365-day Standard Deviation
-    double ceiling = 0.0;     // MA_365 + (2 * STD_365)
-    double floor = 0.0;       // MA_365
-    double median = 0.0;      // (CEILING + FLOOR) / 2
+    double ma_365       = 0.0; // 365-day Moving Average
+    double std_365      = 0.0; // 365-day Standard Deviation
+    double ceiling      = 0.0; // MA_365 + (2 * STD_365)
+    double floor        = 0.0; // MA_365
+    double median       = 0.0; // (CEILING + FLOOR) / 2
     double dynamic_step = 0.0; // Dynamic step based on 364-day Price analysis
-    double step = 0.0;        // Same as dynamic_step
-    double change = 0.0;      // Daily price change
-    double move = 0.0;        // Daily price percentage change
-    double offset = 0.0;      // Percentage distance from MEDIAN
-    double weeks_52 = 0.0;    // 52-week price percentage change
+    double step         = 0.0; // Same as dynamic_step
+    double change       = 0.0; // Daily price change
+    double move         = 0.0; // Daily price percentage change
+    double offset       = 0.0; // Percentage distance from MEDIAN
+    double weeks_52     = 0.0; // 52-week price percentage change
 };
 
 // --- SQLite Functions ---
@@ -285,28 +285,28 @@ std::string format_numeric(double value, const std::string& format_spec) {
 void display_public(const std::vector<PiCycleData>& pi_data_reversed) {
     // Constants for color codes
     const std::string COLOR_BRIGHT_GREEN = "\033[92m";
-    const std::string COLOR_GREEN = "\033[32m";
-    const std::string COLOR_DARK_GREEN = "\033[38;5;22m";
+    const std::string COLOR_GREEN        = "\033[32m";
+    const std::string COLOR_DARK_GREEN   = "\033[38;5;22m";
     const std::string COLOR_YELLOW_GREEN = "\033[38;5;142m";
-    const std::string COLOR_YELLOW = "\033[93m";
-    const std::string COLOR_YELLOW_RED = "\033[38;5;208m";
-    const std::string COLOR_DARK_RED = "\033[38;5;52m";
-    const std::string COLOR_RED = "\033[91m";
-    const std::string COLOR_BRIGHT_RED = "\033[38;5;196m";
-    const std::string COLOR_RESET = "\033[0m";
+    const std::string COLOR_YELLOW       = "\033[93m";
+    const std::string COLOR_YELLOW_RED   = "\033[38;5;208m";
+    const std::string COLOR_DARK_RED     = "\033[38;5;52m";
+    const std::string COLOR_RED          = "\033[91m";
+    const std::string COLOR_BRIGHT_RED   = "\033[38;5;196m";
+    const std::string COLOR_RESET        = "\033[0m";
 
     // Column definitions with their formatting specifications
     static const std::map<std::string, std::map<std::string, std::string>> COLUMN_FORMATS = {
-        {"Date",      {{"width", "10"}, {"align", "<"}, {"prefix", " "}}},
-        {"Price",     {{"width", "10"},  {"align", ">"}, {"prefix", ""}}},
-        {"Move",      {{"width", "7"},  {"align", ">"}, {"prefix", " "}}},
-        {"Offset",    {{"width", "7"},  {"align", ">"}, {"prefix", ""}}},
-        {"CEILING",   {{"width", "10"},  {"align", ">"}, {"prefix", ""}}},
-        {" MEDIAN",   {{"width", "10"},  {"align", ">"}, {"prefix", ""}}},
-        {" FLOOR ",   {{"width", "10"},  {"align", ">"}, {"prefix", ""}}},
-        {"Step",      {{"width", "5"},  {"align", ">"}, {"prefix", ""}}},
-        {"Change",    {{"width", "7"},  {"align", ">"}, {"prefix", ""}}},
-        {"52-weeks",  {{"width", "8"},  {"align", "^"}, {"prefix", " "}}}
+        {"Date",     {{"width", "10"}, {"align", "<"}, {"prefix", " "}}},
+        {"Price",    {{"width", "10"}, {"align", ">"}, {"prefix", ""}}},
+        {"Move",     {{"width", "7"},  {"align", ">"}, {"prefix", " "}}},
+        {"Offset",   {{"width", "7"},  {"align", ">"}, {"prefix", ""}}},
+        {"CEILING",  {{"width", "10"}, {"align", ">"}, {"prefix", ""}}},
+        {" MEDIAN",  {{"width", "10"}, {"align", ">"}, {"prefix", ""}}},
+        {" FLOOR ",  {{"width", "10"}, {"align", ">"}, {"prefix", ""}}},
+        {"Step",     {{"width", "5"},  {"align", ">"}, {"prefix", ""}}},
+        {"Change",   {{"width", "7"},  {"align", ">"}, {"prefix", ""}}},
+        {"52-weeks", {{"width", "8"},  {"align", "^"}, {"prefix", " "}}}
     };
 
     // Print header
