@@ -1,0 +1,30 @@
+# Build artifacts
+build/
+CMakeFiles/
+CMakeCache.txt
+cmake_install.cmake
+Makefile
+*.o
+*.d
+
+# Executables
+1-get-binance-klines
+2-pi-cycle-indicator
+projection
+
+# Database files
+*.db
+
+# External libraries (cloned/downloaded)
+tabulate_lib/
+cli_table_lib/
+
+# Editor/IDE specific files
+.vscode/
+.idea/
+*.swp
+*~
+
+# API keys (if stored in files, though currently hardcoded)
+api_keys.txt
+secrets.json
