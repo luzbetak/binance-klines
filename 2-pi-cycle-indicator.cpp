@@ -473,17 +473,7 @@ int main(int argc, char* argv[]) {
     }
 
     double avg_daily_increase = calculate_average_daily_increase(365 * 4 + 1);
-    double compound_4_year = (std::pow(1 + avg_daily_increase / 100.0, 4) - 1) * 100.0;
 
-    // ANSI escape codes for colors
-    const std::string COLOR_YELLOW = "[93m";
-    const std::string COLOR_RESET = "[0m";
-
-    std::cout << COLOR_YELLOW << std::fixed << std::setprecision(2)
-              << "                               4-year Avg: " << avg_daily_increase << "%/year -> "
-              << compound_4_year << "% compound                  " << COLOR_RESET << std::endl;
-
-    std::cout << "Fetching data from SQLite..." << std::endl;
     std::vector<Kline> klines = fetch_data();
 
     if (klines.empty()) {
