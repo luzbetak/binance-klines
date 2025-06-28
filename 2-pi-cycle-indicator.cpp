@@ -25,6 +25,7 @@ const std::string DB_PATH = "binance.db";
 const std::string GEMINI_API_URL = "https://api.gemini.com/v1/pubticker/btcusd";
 
 // --- Global variables to mimic Python's global state ---
+bool g_debug_enabled = false; // Global flag for debug output
 double first_row_yearly_value = 0.00;
 double first_row_baseline     = 0.00;
 double first_row_avg_price    = 0.00;
@@ -75,7 +76,9 @@ std::vector<Kline> fetch_data() {
         std::cerr << "Error: Can't open database: " << sqlite3_errmsg(db) << std::endl;
         return klines_data;
     } else {
-        std::cout << "Debug: Database opened successfully." << std::endl;
+        if (g_debug_enabled) {
+            std::cout << "Debug: Database opened successfully." << std::endl;
+        }
     }
 
     std::string query = "SELECT dt1 AS Date, price AS Price FROM klines ORDER BY Date ASC;";
@@ -83,11 +86,15 @@ std::vector<Kline> fetch_data() {
 
     rc = sqlite3_prepare_v2(db, query.c_str(), -1, &stmt, 0);
     if (rc != SQLITE_OK) {
-        std::cerr << "Debug: Failed to prepare statement: " << sqlite3_errmsg(db) << std::endl;
+        if (g_debug_enabled) {
+            std::cerr << "Debug: Failed to prepare statement: " << sqlite3_errmsg(db) << std::endl;
+        }
         sqlite3_close(db);
         return klines_data;
     } else {
-        std::cout << "Debug: SQL statement prepared successfully." << std::endl;
+        if (g_debug_enabled) {
+            std::cout << "Debug: SQL statement prepared successfully." << std::endl;
+        }
     }
 
     while ((rc = sqlite3_step(stmt)) == SQLITE_ROW) {
@@ -103,7 +110,9 @@ std::vector<Kline> fetch_data() {
 
     sqlite3_finalize(stmt);
     sqlite3_close(db);
-    std::cout << "Debug: Fetched " << klines_data.size() << " klines from database." << std::endl;
+    if (g_debug_enabled) {
+        std::cout << "Debug: Fetched " << klines_data.size() << " klines from database." << std::endl;
+    }
     return klines_data;
 }
 
@@ -284,35 +293,35 @@ std::string format_numeric(double value, const std::string& format_spec) {
 // --- Display Functions ---
 void display_public(const std::vector<PiCycleData>& pi_data_reversed) {
     // Constants for color codes
-    const std::string COLOR_BRIGHT_GREEN = "\033[92m";
-    const std::string COLOR_GREEN        = "\033[32m";
-    const std::string COLOR_DARK_GREEN   = "\033[38;5;22m";
-    const std::string COLOR_YELLOW_GREEN = "\033[38;5;142m";
-    const std::string COLOR_YELLOW       = "\033[93m";
-    const std::string COLOR_YELLOW_RED   = "\033[38;5;208m";
-    const std::string COLOR_DARK_RED     = "\033[38;5;52m";
-    const std::string COLOR_RED          = "\033[91m";
-    const std::string COLOR_BRIGHT_RED   = "\033[38;5;196m";
-    const std::string COLOR_RESET        = "\033[0m";
+    const std::string COLOR_BRIGHT_GREEN = "[92m";
+    const std::string COLOR_GREEN        = "[32m";
+    const std::string COLOR_DARK_GREEN   = "[38;5;22m";
+    const std::string COLOR_YELLOW_GREEN = "[38;5;142m";
+    const std::string COLOR_YELLOW       = "[93m";
+    const std::string COLOR_YELLOW_RED   = "[38;5;208m";
+    const std::string COLOR_DARK_RED     = "[38;5;52m";
+    const std::string COLOR_RED          = "[91m";
+    const std::string COLOR_BRIGHT_RED   = "[38;5;196m";
+    const std::string COLOR_RESET        = "[0m";
 
     // Column definitions with their formatting specifications
     static const std::map<std::string, std::map<std::string, std::string>> COLUMN_FORMATS = {
         {"Date",     {{"width", "10"}, {"align", "<"}, {"prefix", " "}}},
-        {"Price",    {{"width", "10"}, {"align", ">"}, {"prefix", ""}}},
+        {"Price",    {{"width", "9"}, {"align", ">"}, {"prefix", ""}}},
         {"Move",     {{"width", "7"},  {"align", ">"}, {"prefix", " "}}},
         {"Offset",   {{"width", "7"},  {"align", ">"}, {"prefix", ""}}},
-        {"CEILING",  {{"width", "10"}, {"align", ">"}, {"prefix", ""}}},
-        {" MEDIAN",  {{"width", "10"}, {"align", ">"}, {"prefix", ""}}},
-        {" FLOOR ",  {{"width", "10"}, {"align", ">"}, {"prefix", ""}}},
+        {"CEILING",  {{"width", "9"}, {"align", ">"}, {"prefix", ""}}},
+        {" MEDIAN",  {{"width", "9"}, {"align", ">"}, {"prefix", ""}}},
+        {" FLOOR ",  {{"width", "9"}, {"align", ">"}, {"prefix", ""}}},
         {"Step",     {{"width", "5"},  {"align", ">"}, {"prefix", ""}}},
         {"Change",   {{"width", "7"},  {"align", ">"}, {"prefix", ""}}},
-        {"52-weeks", {{"width", "8"},  {"align", "^"}, {"prefix", " "}}}
+        {"52-weeks", {{"width", "9"},  {"align", "^"}, {"prefix", " "}}}
     };
 
     // Print header
-    std::cout << "+------------+-----------+--------+---------+----------+----------+----------+------+--------+----------+" << std::endl;
-    std::cout << "|    Date    |   Price   |  Move  | Offset  | CEILING  |  MEDIAN  |  FLOOR   | Step | Change | 52-weeks |" << std::endl;
-    std::cout << "+------------+-----------+--------+---------+----------+----------+----------+------+--------+----------+" << std::endl;
+    std::cout << "+------------+----------+--------+--------+----------+----------+----------+------+--------+----------+" << std::endl;
+    std::cout << "|    Date    |   Price  |  Move  | Offset | CEILING  |  MEDIAN  |  FLOOR   | Step | Change | 52-weeks |" << std::endl;
+    std::cout << "+------------+----------+--------+--------+----------+----------+----------+------+--------+----------+" << std::endl;
 
     // Extract first row values for global variables
     if (!pi_data_reversed.empty()) {
@@ -387,7 +396,7 @@ void display_public(const std::vector<PiCycleData>& pi_data_reversed) {
 
         std::cout << row_color << ss_row.str() << COLOR_RESET << std::endl;
     }
-    std::cout << "+------------+-----------+--------+---------+----------+----------+----------+------+--------+----------+" << std::endl;
+    std::cout << "+------------+----------+--------+--------+----------+----------+----------+------+--------+----------+" << std::endl;
 }
 
 void prediction_target_step(const std::vector<PiCycleData>& pi_data_reversed) {
@@ -429,12 +438,12 @@ void prediction_target_step(const std::vector<PiCycleData>& pi_data_reversed) {
     std::time_t date_4w_c = std::chrono::system_clock::to_time_t(date_4w);
     std::tm* ptm_4w = std::localtime(&date_4w_c);
 
-    std::cout << "+----------+----------+-------------------+" << std::endl;
-    std::cout << "|    2025  | " << std::setw(8) << std::right << "$" << std::fixed << std::setprecision(0) << predicted_price_2025 << " | "
-              << std::put_time(&end_2025_tm, "%B %d, %Y") << " |" << std::endl;
-    std::cout << "|    +4w   | " << std::setw(8) << std::right << "$" << std::fixed << std::setprecision(0) << predicted_price_4w << " | "
-              << std::put_time(ptm_4w, "%B %d, %Y") << " |" << std::endl;
-    std::cout << "+----------+----------+-------------------+" << std::endl;
+    std::cout << "+------------+----------+-------------------------------+" << std::endl;
+    std::cout << "|    2025    | " << std::setw(2) << std::right << "$" << std::fixed << std::setprecision(0) << predicted_price_2025 << " | "
+              << std::put_time(&end_2025_tm, "%B %d, %Y") << std::endl;
+    std::cout << "|    +4w     | " << std::setw(2) << std::right << "$" << std::fixed << std::setprecision(0) << predicted_price_4w << " | "
+              << std::put_time(ptm_4w, "%B %d, %Y") << std::endl;
+    std::cout << "+------------+----------+-------------------------------+" << std::endl;
 }
 
 // --- Main Function ---
@@ -447,14 +456,19 @@ int main(int argc, char* argv[]) {
     #endif
 
     int num_display_days = 33;
-    if (argc > 1) {
-        try {
-            num_display_days = std::stoi(argv[1]);
-            if (num_display_days < 33) num_display_days = 33;
-        } catch (const std::invalid_argument& e) {
-            std::cerr << "Invalid argument for num_display_days: " << argv[1] << std::endl;
-        } catch (const std::out_of_range& e) {
-            std::cerr << "num_display_days out of range: " << argv[1] << std::endl;
+    for (int i = 1; i < argc; ++i) {
+        std::string arg = argv[i];
+        if (arg == "--debug") {
+            g_debug_enabled = true;
+        } else {
+            try {
+                num_display_days = std::stoi(arg);
+                if (num_display_days < 33) num_display_days = 33;
+            } catch (const std::invalid_argument& e) {
+                std::cerr << "Invalid argument for num_display_days: " << arg << std::endl;
+            } catch (const std::out_of_range& e) {
+                std::cerr << "num_display_days out of range: " << arg << std::endl;
+            }
         }
     }
 
@@ -462,8 +476,8 @@ int main(int argc, char* argv[]) {
     double compound_4_year = (std::pow(1 + avg_daily_increase / 100.0, 4) - 1) * 100.0;
 
     // ANSI escape codes for colors
-    const std::string COLOR_YELLOW = "\033[93m";
-    const std::string COLOR_RESET = "\033[0m";
+    const std::string COLOR_YELLOW = "[93m";
+    const std::string COLOR_RESET = "[0m";
 
     std::cout << COLOR_YELLOW << std::fixed << std::setprecision(2)
               << "                               4-year Avg: " << avg_daily_increase << "%/year -> "
@@ -477,7 +491,9 @@ int main(int argc, char* argv[]) {
         return 1;
     }
 
-    std::cout << "Debug: Fetched " << klines.size() << " klines." << std::endl;
+    if (g_debug_enabled) {
+        std::cout << "Debug: Fetched " << klines.size() << " klines." << std::endl;
+    }
 
     std::vector<PiCycleData> pi_data = price_projection(klines, (avg_daily_increase / 100.0) + 1);
     pi_data = add_calculated_fields(pi_data, num_display_days);
