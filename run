@@ -1,0 +1,6 @@
+#!/bin/bash
+
+cd build
+cmake ..
+make
+./2-pi-cycle-indicator
