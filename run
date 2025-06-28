@@ -16,9 +16,6 @@ cmake ..
 echo "Building project..."
 make
 
-echo "Running 1-get-binance-klines..."
-./1-get-binance-klines
-
-echo "Running 2-pi-cycle-indicator..."
-./2-pi-cycle-indicator
+echo "Running ./3-pi-cycle-pro ..."
+./3-pi-cycle-pro 
 
