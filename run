@@ -6,8 +6,6 @@ set -e  # Exit on error
 if [ ! -d build ]; then
     echo "Creating build directory..."
     mkdir build
-else
-    echo "Build directory exists."
 fi
 
 cd build
