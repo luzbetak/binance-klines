@@ -114,7 +114,9 @@ void create_klines_table(sqlite3* db) {
         std::cerr << "SQL error (create_klines_table): " << err_msg << std::endl;
         sqlite3_free(err_msg);
     } else {
-        std::cout << "Table 'klines' checked/created successfully." << std::endl;
+        if (g_debug_enabled) {
+            std::cout << "Debug: Table 'klines' checked/created successfully." << std::endl;
+        }
     }
 }
 
@@ -160,7 +162,9 @@ void insert_klines_data(sqlite3* db, const std::vector<Kline>& klines) {
     }
     sqlite3_finalize(stmt);
     sqlite3_exec(db, "END TRANSACTION;", NULL, NULL, NULL);
-    std::cout << "Klines data inserted/updated successfully." << std::endl;
+    if (g_debug_enabled) {
+        std::cout << "Debug: Klines data inserted/updated successfully." << std::endl;
+    }
 }
 
 /*----------------------------------------------------------------------------------------------------*/
@@ -184,7 +188,9 @@ void update_current_date_price_with_close(sqlite3* db) {
             if (sqlite3_step(stmt) == SQLITE_ROW) {
                 const unsigned char* latest_date = sqlite3_column_text(stmt, 0);
                 if (latest_date) {
-                    std::cout << "Updated price with close price for latest date: " << latest_date << std::endl;
+                    if (g_debug_enabled) {
+                        std::cout << "Debug: Updated price with close price for latest date: " << latest_date << std::endl;
+                    }
                 } else {
                     std::cout << "No records found to update in the klines table." << std::endl;
                 }
@@ -241,7 +247,9 @@ std::vector<Kline> get_klines_from_binance() {
 
                         klines_data.push_back(kline);
                     }
-                    std::cout << "Fetched " << klines_data.size() << " klines from Binance." << std::endl;
+                    if (g_debug_enabled) {
+                        std::cout << "Debug: Fetched " << klines_data.size() << " klines from Binance." << std::endl;
+                    }
                 } else if (klines_json.is_object() && klines_json.contains("msg")) {
                     std::cerr << "Binance API Error: " << klines_json["msg"].get<std::string>() << std::endl;
                 } else {
@@ -629,12 +637,12 @@ void prediction_target_step(const std::vector<PiCycleData>& pi_data_reversed) {
     std::time_t date_4w_c = std::chrono::system_clock::to_time_t(date_4w);
     std::tm* ptm_4w = std::localtime(&date_4w_c);
 
-    std::cout << "+------------+----------+-------------------------------+" << std::endl;
-    std::cout << "|    2025    | " << std::setw(2) << std::right << "$" << std::fixed << std::setprecision(0) << predicted_price_2025 << " | "
-              << std::put_time(ptm_now, "%B %d, %Y") << std::endl;
-    std::cout << "|    +4w     | " << std::setw(2) << std::right << "$" << std::fixed << std::setprecision(0) << predicted_price_4w << " | "
+    std::cout << "+------------+------------+-------------------------------+" << std::endl;
+    std::cout << "|    2025    | " << std::setw(2) << std::right << "$" << format_numeric(predicted_price_2025, "0f") << "  | "
+              << std::put_time(&end_2025_tm, "%B %d, %Y") << std::endl;
+    std::cout << "|    +4w     | " << std::setw(2) << std::right << "$" << format_numeric(predicted_price_4w, "0f") << "  | "
               << std::put_time(ptm_4w, "%B %d, %Y") << std::endl;
-    std::cout << "+------------+----------+-------------------------------+" << std::endl;
+    std::cout << "+------------+------------+-------------------------------+" << std::endl;
 }
 
 // --- Main Function ---
@@ -648,7 +656,9 @@ int main(int argc, char* argv[]) {
         std::cerr << "Can't open database: " << sqlite3_errmsg(db) << std::endl;
         return 1;
     } else {
-        std::cout << "Opened database successfully." << std::endl;
+        if (g_debug_enabled) {
+            std::cout << "Debug: Opened database successfully." << std::endl;
+        }
     }
 
     create_klines_table(db);
@@ -662,7 +672,9 @@ int main(int argc, char* argv[]) {
     }
 
     sqlite3_close(db);
-    std::cout << "\n--- Kline data update complete ---\n" << std::endl;
+    if (g_debug_enabled) {
+        std::cout << "\nDebug: --- Kline data update complete ---\n" << std::endl;
+    }
 
 
     // --- Part 2: Pi Cycle Indicator ---
