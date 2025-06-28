@@ -21,7 +21,7 @@ using json = nlohmann::json;
 #include <sqlite3.h>
 
 // --- Global Constants (for simplicity, should be in config or env vars) ---
-const std::string DB_PATH = "binance.db";
+const std::string DB_PATH        = "binance.db";
 const std::string GEMINI_API_URL = "https://api.gemini.com/v1/pubticker/btcusd";
 
 // --- Global variables to mimic Python's global state ---
@@ -325,11 +325,11 @@ void display_public(const std::vector<PiCycleData>& pi_data_reversed) {
 
     // Extract first row values for global variables
     if (!pi_data_reversed.empty()) {
-        const auto& first_row = pi_data_reversed[0];
+        const auto& first_row  = pi_data_reversed[0];
         first_row_yearly_value = first_row.weeks_52;
-        first_row_baseline = first_row.median;
-        first_row_step = first_row.step;
-        first_row_avg_price = first_row.price;
+        first_row_baseline     = first_row.median;
+        first_row_step         = first_row.step;
+        first_row_avg_price    = first_row.price;
     }
 
     for (const auto& row : pi_data_reversed) {
@@ -416,22 +416,22 @@ void prediction_target_step(const std::vector<PiCycleData>& pi_data_reversed) {
     std::cout << "| " << RANGE << "-day Avg Step: " << average_top_steps << " (Dynamic 364-day Price-based)" << std::endl;
 
     // Get current date
-    auto now = std::chrono::system_clock::now();
+    auto now          = std::chrono::system_clock::now();
     std::time_t now_c = std::chrono::system_clock::to_time_t(now);
-    std::tm* ptm_now = std::localtime(&now_c);
+    std::tm* ptm_now  = std::localtime(&now_c);
 
     // Calculate days until end of 2025
-    std::tm end_2025_tm = *ptm_now; // Copy current time info
-    end_2025_tm.tm_year = 2025 - 1900; // Year is 1900-based
-    end_2025_tm.tm_mon = 11; // Month is 0-based (December)
-    end_2025_tm.tm_mday = 31; // Day of month
+    std::tm end_2025_tm    = *ptm_now;    // Copy current time info
+    end_2025_tm.tm_year    = 2025 - 1900; // Year is 1900-based
+    end_2025_tm.tm_mon     = 11;          // Month is 0-based (December)
+    end_2025_tm.tm_mday    = 31;          // Day of month
     std::time_t end_2025_t = std::mktime(&end_2025_tm);
     
     long long days_until_2025 = (end_2025_t - now_c) / (60 * 60 * 24);
 
     // Predictions
     double predicted_price_2025 = first_row_baseline + (average_top_steps * days_until_2025);
-    double predicted_price_4w = first_row_baseline + (average_top_steps * RANGE);
+    double predicted_price_4w   = first_row_baseline + (average_top_steps * RANGE);
 
     // Calculate dates for predictions
     auto date_4w = now + std::chrono::hours(24 * RANGE);
