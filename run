@@ -1,6 +1,8 @@
 #!/bin/bash
 
+mkdir build
 cd build
 cmake ..
 make
+./1-get-binance-klines
 ./2-pi-cycle-indicator
