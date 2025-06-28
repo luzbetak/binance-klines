@@ -15,9 +15,6 @@ find_package(SQLite3 REQUIRED)
 include_directories(${CMAKE_CURRENT_SOURCE_DIR})
 include_directories(/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/c++/v1)
 
-# Add tabulate library
-# include_directories(${CMAKE_CURRENT_SOURCE_DIR}/tabulate_lib/include) # Removed tabulate
-
 add_executable(1-get-binance-klines 1-get-binance-klines.cpp)
 add_executable(2-pi-cycle-indicator 2-pi-cycle-indicator.cpp)
 
@@ -25,4 +22,5 @@ target_link_libraries(1-get-binance-klines PRIVATE ${CURL_LIBRARIES} ${SQLite3_L
 target_link_libraries(2-pi-cycle-indicator PRIVATE ${CURL_LIBRARIES} ${SQLite3_LIBRARIES})
 
 # Install rules
-install(TARGETS 1-get-binance-klines 2-pi-cycle-indicator DESTINATION /Users/mac/projects/binance)
+install(TARGETS 1-get-binance-klines 2-pi-cycle-indicator DESTINATION /Users/mac/binance-klines)
+
